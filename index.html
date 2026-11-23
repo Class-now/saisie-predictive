@@ -27,7 +27,7 @@
 html,body{margin:0;background:var(--bg);color:var(--ink)}
 body{font:16px/1.6 "Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;min-height:100vh}
 .wrap{max-width:1080px;margin:0 auto;padding:24px 16px 48px;display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:32px;align-items:start}
-@media (max-width:860px){.wrap{grid-template-columns:1fr;gap:20px}}
+@media (max-width:860px){.wrap{grid-template-columns:minmax(0,1fr);gap:20px}}
 header.top{grid-column:1/-1;display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
 h1{font-weight:400;font-size:clamp(28px,5vw,42px);letter-spacing:.01em;margin:0}
 h1 small{display:block;font-size:15px;color:var(--mute);letter-spacing:.04em;margin-top:4px}
@@ -44,7 +44,7 @@ button{font:inherit;color:inherit}
 .tip{position:fixed;z-index:20;max-width:280px;background:var(--ink);color:var(--bg);font:14px/1.45 system-ui,sans-serif;padding:8px 10px;border-radius:8px;pointer-events:none;opacity:0;transition:opacity .15s}
 .tip.on{opacity:1}
 .tip b{font-weight:600}
-.phone{position:sticky;top:16px;background:var(--phone);border:1px solid var(--line);border-radius:28px;padding:14px 12px 12px;box-shadow:0 10px 40px rgba(0,0,0,.08);display:flex;flex-direction:column;height:min(760px,calc(100vh - 32px))}
+.phone{position:sticky;top:16px;background:var(--phone);border:1px solid var(--line);border-radius:28px;padding:14px 12px 12px;box-shadow:0 10px 40px rgba(0,0,0,.08);min-width:0;display:flex;flex-direction:column;height:min(760px,calc(100vh - 110px))}
 @media (max-width:860px){.phone{position:relative;top:0;height:640px}}
 .status{display:flex;justify-content:space-between;font:12px/1 system-ui,sans-serif;color:var(--mute);padding:2px 10px 10px}
 .chat{flex:1;overflow-y:auto;padding:4px 6px;display:flex;flex-direction:column;gap:8px;font-family:"Hiragino Sans","Yu Gothic","Noto Sans JP",system-ui,sans-serif;font-size:15px;line-height:1.45}
@@ -54,7 +54,7 @@ button{font:inherit;color:inherit}
 .msg.keiko{align-self:flex-end;background:var(--keiko);border-bottom-right-radius:4px}
 .msg .gl{display:none;font:13px/1.4 "Iowan Old Style",Georgia,serif;color:var(--mute);margin-top:4px;border-top:1px dashed var(--line);padding-top:4px}
 .msg .gl i{display:block;font-style:normal;font-family:system-ui,sans-serif;font-size:12px}
-.msg.open .gl{display:block}
+.msg.open .gl,body.tr .msg .gl{display:block}
 .msg.photo{font-size:13px;color:var(--mute);font-style:italic;background:transparent;border:1px dashed var(--line)}
 .msg.erased{opacity:.45;text-decoration:line-through}
 .typing{min-height:34px;margin:8px 6px 6px;padding:6px 10px;border:1px solid var(--line);border-radius:18px;font-family:"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;font-size:15px;display:flex;align-items:center;gap:2px}
@@ -63,7 +63,7 @@ button{font:inherit;color:inherit}
 .bar{display:flex;gap:6px;padding:6px;background:var(--bar);border-radius:12px;min-height:52px}
 .sug{flex:1;min-width:0;border:0;background:var(--key);border-radius:8px;padding:6px 4px;cursor:pointer;font-family:"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;font-size:15px;line-height:1.2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:transform .1s}
 .sug:hover,.sug:focus-visible{transform:translateY(-1px);outline:2px solid var(--accent);outline-offset:1px}
-.sug small{font:11px/1.2 system-ui,sans-serif;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.sug small{font:11px/1.2 system-ui,sans-serif;color:var(--mute);white-space:normal;overflow-wrap:anywhere;text-align:center;max-width:100%}
 .sug.manual small{color:var(--new)}
 .sug .n{font:10px/1 system-ui,sans-serif;color:var(--mute)}
 .sug[disabled]{opacity:.35;cursor:default;transform:none;outline:none}
@@ -90,6 +90,7 @@ table.dict td.w{font-family:"Hiragino Sans","Noto Sans JP",sans-serif;font-size:
     <h1>Saisie prédictive<small>récit d'un clavier · 予測変換</small></h1>
     <div class="tools">
       <button class="tbtn" id="bDict">Dictionnaire utilisateur</button>
+      <button class="tbtn" id="bTr" aria-pressed="false">Traductions</button>
       <button class="tbtn" id="bVoice" aria-pressed="false">Voix</button>
       <button class="tbtn" id="bTheme">Clair / sombre</button>
     </div>
@@ -120,7 +121,7 @@ table.dict td.w{font-family:"Hiragino Sans","Noto Sans JP",sans-serif;font-size:
 /* [[mot|lecture|sens]] : mot japonais lisible et audible dans le récit */
 const PROLOGUE = [
   "Je suis un clavier. Pas les touches : ce qu'il y a derrière. Un grand dictionnaire de soixante mille mots, livré avec le téléphone, et un petit, que j'écris moi-même et qu'on appelle le dictionnaire utilisateur. Chaque fois que Keiko choisit un mot, je le note. Chaque fois qu'elle le choisit de nouveau, je le fais monter d'une place. Mon métier tient en une phrase : deviner le mot suivant.",
-  "Keiko a cinquante-six ans. Elle vit à Sakai, au sud d'Osaka, elle tape du pouce gauche, lentement, dans le parler de sa ville, et elle ne se relit jamais. En quatre ans, j'ai appris d'elle trois mille deux cents mots. Les dix premiers, par ordre de fréquence : [[ほんま|honma|vraiment]], [[ええ|ē|bien, d'accord]], [[晩ご飯|bangohan|le dîner]], [[帰り|kaeri|le retour]], [[何時|nanji|à quelle heure]], [[あかん|akan|non, ça ne va pas]], [[気ぃつけて|ki-tsukete|fais attention]], [[ありがとう|arigatō|merci]], [[お父さん|otōsan|ton père]], [[澪|Mio|le prénom de sa fille]].",
+  "Keiko a cinquante-six ans. Elle vit à Sakai, au sud d'Osaka, elle tape du pouce gauche, lentement, dans le parler de sa ville, et elle se relit rarement. En quatre ans, j'ai appris d'elle trois mille deux cents mots. Les dix premiers, par ordre de fréquence : [[ほんま|honma|vraiment]], [[ええ|ē|bien, d'accord]], [[晩ご飯|bangohan|le dîner]], [[帰り|kaeri|le retour]], [[何時|nanji|à quelle heure]], [[あかん|akan|non, ça ne va pas]], [[気ぃつけて|ki-tsukete|fais attention]], [[ありがとう|arigatō|merci]], [[お父さん|otōsan|ton père]], [[澪|Mio|le prénom de sa fille]].",
   "Le 2 septembre, sa fille est partie pour une année d'échange à Lyon."
 ];
 const HINT = "Dans le téléphone, touchez un mot de la barre de suggestions pour l'écrire à la place de Keiko. Touchez une bulle pour la lire en français. Les mots soulignés se lisent et, si la voix est activée, s'entendent.";
@@ -141,32 +142,32 @@ const SCENES = [
      reply:[{f:"mio",jp:"14時間後な",ro:"jūyo-jikan go na",fr:"Dans quatorze heures, alors."}],
      after:"Elle a demandé qu'on lui écrive plus tard. C'est une manière de ne pas dire maintenant ce qu'on pense maintenant."}
   ],
-  end:["Puis elle a tapé, sans moi, lettre par lettre : [[泣いてるやん|naiteru yan|tu pleures, si]]. Elle a effacé. Je ne propose jamais ce que les gens savent déjà."],
+  end:["Puis elle a tapé, sans moi, lettre par lettre : [[泣いてるやん|naiteru yan|mais tu pleures, toi]]. Elle a effacé. Je ne propose jamais ce que les gens savent déjà."],
   learn:false },
 
 { id:"bonjour", date:"4 septembre · 7 h 12 à Sakai, minuit douze à Lyon", clock:"7:12",
   before:["La première photo est arrivée pendant que Keiko faisait chauffer l'eau du thé."],
   msgs:[{f:"mio",photo:"[photo : un croissant sur une table de cuisine, un ticket de tram à côté]"},
         {f:"mio",jp:"リヨン寒い。パン屋さんで「ボンジュール」言えた！",ro:"Riyon samui. panya-san de « bonjūru » ieta !",fr:"Il fait froid à Lyon. J'ai réussi à dire « bonjour » à la boulangerie !"}],
-  before2:"Un mot que je ne connaissais pas. [[ボンジュール|bonjūru|bonjour, en katakana]]. Cinq signes, avec ce petit trait qui allonge le ju comme on tient une note. Keiko a tapé b, o, n. Je n'avais rien de juste à proposer.",
+  before2:"Un mot que je ne connaissais pas. [[ボンジュール|bonjūru|bonjour, en katakana]]. Six signes, avec ce petit trait qui allonge le ju comme on tient une note. Keiko a tapé b, o, n. Je n'avais rien de juste à proposer.",
   typed:"bon",
   opts:[
     {w:"盆",r:"bon",g:"la fête des morts, en août",base:3,
      reply:[{f:"keiko",jp:"盆",ro:"bon",fr:"Bon (la fête des morts).",erased:true},{f:"mio",jp:"お盆ちゃうし笑",ro:"obon chau shi",fr:"C'est pas la fête des morts (rire)."},{f:"keiko",jp:"ボンジュール",ro:"bonjūru",fr:"Bonjour."}],
-     after:"Mon premier mot de français fut une erreur. Keiko a envoyé la fête des morts à une fille qui venait d'apprendre à dire bonjour ; puis, lentement, elle a tapé ce que je ne savais pas."},
+     after:"Mon premier mot de français a été une erreur. Keiko a envoyé la fête des morts à une fille qui venait d'apprendre à dire bonjour ; puis, lentement, elle a tapé ce que je ne savais pas."},
     {w:"凡人",r:"bonjin",g:"une personne ordinaire",base:1,
-     reply:[{f:"keiko",jp:"凡人",ro:"bonjin",fr:"Personne ordinaire.",erased:true},{f:"mio",jp:"誰が凡人やねん",ro:"dare ga bonjin ya nen",fr:"Qui tu traites de personne ordinaire ?"},{f:"keiko",jp:"ボンジュール",ro:"bonjūru",fr:"Bonjour."}],
+     reply:[{f:"keiko",jp:"凡人",ro:"bonjin",fr:"Personne ordinaire.",erased:true},{f:"mio",jp:"誰が凡人やねん",ro:"dare ga bonjin ya nen",fr:"Comment ça, ordinaire ?"},{f:"keiko",jp:"ボンジュール",ro:"bonjūru",fr:"Bonjour."}],
      after:"Je lui ai proposé « une personne ordinaire ». Mio a ri. Il y a des erreurs qui font plus pour une conversation que tous les mots justes."},
     {w:"ボンジュール",r:"bonjūru",g:"bonjour — tapé lettre par lettre",manual:true,base:0,
      reply:[{f:"keiko",jp:"ボンジュール！",ro:"bonjūru !",fr:"Bonjour !"},{f:"mio",jp:"ボンジュール！！",ro:"bonjūru !!",fr:"Bonjour !!"}],
-     after:"Elle ne m'a pas attendu. Elle a tapé les cinq signes un à un, comme on recopie une adresse étrangère sur une enveloppe."}
+     after:"Elle ne m'a pas attendu. Elle a tapé les six signes un à un, comme on recopie une adresse étrangère sur une enveloppe."}
   ],
   end:["Je l'ai inscrit dans le petit dictionnaire. Date : 4 septembre. Fréquence : 1. C'était le premier mot que Mio lui apprenait depuis l'école primaire."],
   learn:{w:"ボンジュール",r:"bonjūru",g:"bonjour ; et aussi : je suis bien arrivée"} },
 
 { id:"pain", date:"20 septembre", clock:"19:05",
-  before:["Les mères demandent ce qu'on mange. Le clavier le sait mieux que personne : après [[澪|Mio|sa fille]], le mot que Keiko tape le plus souvent est [[ご飯|gohan|le riz, le repas]]."],
-  msgs:[{f:"keiko",jp:"ご飯ちゃんと食べてる？",ro:"gohan chanto tabeteru ?",fr:"Tu manges correctement ?"},
+  before:["Les mères demandent ce qu'on mange. Le clavier le sait mieux que personne : juste derrière [[澪|Mio|sa fille]], dans ses phrases, le mot que Keiko tape le plus souvent est [[ご飯|gohan|le riz, le repas]]."],
+  msgs:[{f:"keiko",jp:"ご飯ちゃんと食べてる？",ro:"gohan chanto tabeteru ?",fr:"Tu manges bien ?"},
         {f:"mio",jp:"パン・オ・ショコラばっかり。あと学食のキッシュ",ro:"pan o shokora bakkari. ato gakushoku no kisshu",fr:"Que des pains au chocolat. Et la quiche du restaurant universitaire."}],
   typed:"pan",
   opts:[
@@ -175,7 +176,7 @@ const SCENES = [
      after:"J'avais assemblé la phrase avec des morceaux anciens : [[パン|pan|le pain]], qu'elle tape pour les courses, et [[あかん|akan|ça ne va pas]], qu'elle tape pour tout le reste. Une phrase de mère fabriquée par une machine. Elle l'a envoyée sans changer une lettre."},
     {w:"パンダ",r:"panda",g:"un panda",base:1,
      reply:[{f:"keiko",jp:"パンダ",ro:"panda",fr:"Panda.",erased:true},{f:"mio",jp:"？",ro:"?",fr:"?"},{f:"keiko",jp:"おにぎり送ろか",ro:"onigiri okuro ka",fr:"Je t'envoie des boulettes de riz ?"}],
-     after:"Un panda est parti vers Lyon. Je ne m'excuse pas : en japonais, le pain et le panda commencent pareil, et c'est la langue qui a voulu que le pain vienne du portugais."},
+     after:"Un panda est parti vers Lyon. Je ne m'excuse pas : en japonais, le pain et le panda commencent par les deux mêmes signes, et je ne connais que les débuts."},
     {w:"パンオショコラ",r:"pan o shokora",g:"pain au chocolat — tapé lettre par lettre",manual:true,base:0,
      reply:[{f:"keiko",jp:"パンオショコラって何",ro:"pan o shokora tte nani",fr:"C'est quoi, un pain au chocolat ?"},{f:"mio",jp:"チョコ入りのクロワッサンみたいなやつ",ro:"choko-iri no kurowassan mitai na yatsu",fr:"Une sorte de croissant avec du chocolat dedans."}],
      after:"Elle a recopié le mot de sa fille pour pouvoir demander ce qu'il voulait dire. C'est ainsi que l'on entre dans une langue : par la porte qu'un autre a laissée ouverte."}
@@ -197,7 +198,7 @@ const SCENES = [
      reply:[{f:"keiko",jp:"出かける",ro:"dekakeru",fr:"Je sors.",erased:true},{f:"mio",jp:"どこ行くん？",ro:"doko iku n ?",fr:"Tu vas où ?"},{f:"keiko",jp:"どこも",ro:"doko mo",fr:"Nulle part."}],
      after:"« Je sors », a dit le clavier ; « Nulle part », a corrigé Keiko. Elle n'était allée nulle part depuis le 2 septembre, sauf à la poste."},
     {w:"デカラージュ",r:"dekarāju",g:"décalage — tapé lettre par lettre",manual:true,base:0,
-     reply:[{f:"keiko",jp:"デカラージュ",ro:"dekarāju",fr:"Décalage."},{f:"mio",jp:"発音それっぽい",ro:"hatsuon sore ppoi",fr:"La prononciation a l'air bonne."}],
+     reply:[{f:"keiko",jp:"デカラージュ",ro:"dekarāju",fr:"Décalage."},{f:"mio",jp:"発音それっぽい",ro:"hatsuon sore ppoi",fr:"Ça sonne plutôt juste."}],
      after:"Elle a tapé de, ka, ra, ā, ju. Le français n'a pas de katakana ; il faut tout lui fabriquer, une syllabe après l'autre, comme on coud un vêtement à quelqu'un qu'on ne voit plus."}
   ],
   end:["Elle a terminé par [[おやすみ|oyasumi|bonne nuit]], à 6 h 34 du matin. Je l'ai proposé sans hésiter : depuis octobre, c'est le mot qu'elle tape le plus souvent avant le petit-déjeuner."],
@@ -212,15 +213,15 @@ const SCENES = [
   opts:[
     {w:"鯖",r:"saba",g:"le maquereau",base:2,
      reply:[{f:"keiko",jp:"鯖？",ro:"saba ?",fr:"Maquereau ?"},{f:"mio",jp:"鯖？？？ ça va のこと？笑笑笑",ro:"saba ??? « ça va » no koto ?",fr:"Maquereau ??? Tu veux dire « ça va » ? (rire)"},{f:"keiko",jp:"鯖。",ro:"saba.",fr:"Maquereau."},{f:"mio",jp:"鯖鯖。ça va bien, et toi ?",ro:"saba saba. « ça va bien, et toi ? »",fr:"Maquereau, maquereau. Ça va bien, et toi ?"}],
-     after:"Dans mon grand dictionnaire, [[鯖|saba|le maquereau]] est un poisson. Dans le petit, depuis ce soir, c'est une question. Je ne l'ai pas compris tout de suite. Les dictionnaires n'ont pas de sens de l'humour ; ils ont des fréquences, et la fréquence de ce poisson, entre elles deux, n'a cessé de monter."},
+     after:"Dans mon grand dictionnaire, [[鯖|saba|le maquereau]] est un poisson. Dans le petit, depuis ce soir, c'est une question. Je ne l'ai pas compris tout de suite. Les dictionnaires n'ont pas le sens de l'humour ; ils ont des fréquences, et la fréquence de ce poisson, entre elles deux, n'a cessé de monter."},
     {w:"さば",r:"saba",g:"en hiragana, sans le poisson",base:1,
      reply:[{f:"keiko",jp:"さば？",ro:"saba ?",fr:"Saba ?"},{f:"mio",jp:"さば…？ あ、ça va か！ça va bien, et toi ?",ro:"saba… ? a, « ça va » ka ! « ça va bien, et toi ? »",fr:"Saba… ? Ah, « ça va » ! Ça va bien, et toi ?"}],
      after:"Elle a refusé le poisson et gardé les deux syllabes nues. Mio a mis une seconde à comprendre. Pendant une seconde, sa mère a parlé une langue que personne d'autre au monde ne parlait."},
     {w:"サヴァ",r:"sava",g:"ça va — tapé lettre par lettre",manual:true,base:0,
      reply:[{f:"keiko",jp:"サヴァ？",ro:"sava ?",fr:"Ça va ?"},{f:"mio",jp:"サヴァ！ ça va bien, et toi ?",ro:"sava ! « ça va bien, et toi ? »",fr:"Ça va ! Ça va bien, et toi ?"}],
-     after:"Il n'y a pas de v en japonais. On l'a inventé pour les étrangers : un u avec deux petits traits, qui se prononce comme on peut. Keiko l'a trouvé toute seule, au fond de la touche."}
+     after:"Il n'y a pas de v en japonais. On l'a inventé pour les mots étrangers : un u avec deux petits traits, qui se prononce comme on peut. Keiko l'a trouvé toute seule, au fond de la touche."}
   ],
-  end:["Mio a répondu par la phrase entière, en français, la première qu'elle écrivait dans sa propre langue d'après. Keiko l'a copiée dans son cahier du jeudi. Le cahier, je ne le vois pas. Je sais qu'il existe parce qu'elle tape, le jeudi soir, des mots qu'elle n'a pu apprendre que par écrit."],
+  end:["Mio a répondu par la phrase entière, en français, la première qu'elle écrivait en français à sa mère. Keiko l'a copiée dans son cahier du jeudi. Le cahier, je ne le vois pas. Je sais qu'il existe parce qu'elle tape, le jeudi soir, des mots qu'elle n'a pu apprendre que par écrit."],
   learn:"choice" },
 
 { id:"noel", date:"24 décembre", clock:"23:50",
@@ -232,11 +233,11 @@ const SCENES = [
      reply:[{f:"mio",jp:"メリクリ。こっちは Joyeux Noël やで",ro:"merikuri. kocchi wa « Joyeux Noël » ya de",fr:"Joyeux Noël. Ici, on dit « Joyeux Noël »."}],
      after:"J'ai proposé l'anglais, parce que c'est l'anglais que le Japon a appris pour Noël. Mio l'a corrigé avec douceur, en citant la langue où elle était seule ce soir-là."},
     {w:"除夜",r:"joya",g:"la nuit du 31 décembre",base:1,
-     reply:[{f:"keiko",jp:"除夜",ro:"joya",fr:"La nuit du réveillon.",erased:true},{f:"mio",jp:"まだ一週間早いで",ro:"mada isshūkan hayai de",fr:"T'as une semaine d'avance."}],
-     after:"J'ai avancé le calendrier d'une semaine, jusqu'à la nuit des cent huit cloches. Il fallait bien que l'année passe plus vite pour quelqu'un."},
+     reply:[{f:"keiko",jp:"除夜",ro:"joya",fr:"La nuit du 31.",erased:true},{f:"mio",jp:"まだ一週間早いで",ro:"mada isshūkan hayai de",fr:"T'as une semaine d'avance."}],
+     after:"J'ai avancé le calendrier d'une semaine, jusqu'à la nuit des cent huit coups de cloche. Il fallait bien que l'année passe plus vite pour quelqu'un."},
     {w:"ジョワイユー・ノエル",r:"jowaiyū noeru",g:"Joyeux Noël — tapé lettre par lettre",manual:true,base:0,
      reply:[{f:"keiko",jp:"ジョワイユー・ノエル",ro:"jowaiyū noeru",fr:"Joyeux Noël."},{f:"mio",jp:"ママ…泣く",ro:"mama… naku",fr:"Maman… je vais pleurer."}],
-     after:"Elle a mis le petit point du milieu entre les deux mots, comme on met une main sur une épaule. Il est 15 h 50 à Lyon. Mio a répondu en moins d'une minute."}
+     after:"Elle a mis le petit point du milieu entre les deux mots, comme on met une main sur une épaule. Il était 15 h 50 à Lyon. Mio a répondu en moins d'une minute."}
   ],
   end:[],
   learn:{w:"ジョワイユー・ノエル",r:"jowaiyū noeru",g:"Joyeux Noël ; la phrase recopiée quatre fois"} },
@@ -249,20 +250,20 @@ const SCENES = [
   opts:[
     {w:"鏡餅",r:"kagami-mochi",g:"le gâteau de riz du Nouvel An",base:5,
      reply:[{f:"mio",jp:"それ。忘れてた。こわ",ro:"sore. wasureteta. kowa",fr:"C'est ça. Je l'avais oublié. Ça fait peur."}],
-     after:"Keiko n'a jamais eu besoin de moi pour écrire [[鏡餅|kagami-mochi|le gâteau de riz du Nouvel An]] ; je l'ai pourtant proposé avant qu'elle ait fini le ka. Le miroir et le riz : deux caractères qu'elle connaît depuis l'âge de sept ans. Sa fille en a vingt, et elle les a perdus en quatre mois."},
+     after:"Keiko n'a jamais eu besoin de moi pour écrire [[鏡餅|kagami-mochi|le gâteau de riz du Nouvel An]] ; je l'ai pourtant proposé avant qu'elle ait fini le ka. Le miroir et le mochi : deux caractères qu'elle connaît depuis l'enfance. Sa fille a vingt ans, et elle les a perdus en quatre mois."},
     {w:"鏡",r:"kagami",g:"le miroir",base:3,
      reply:[{f:"keiko",jp:"鏡に餅",ro:"kagami ni mochi",fr:"Miroir, puis riz."},{f:"mio",jp:"あ、そうか。鏡餅。こわ、忘れてた",ro:"a, sō ka. kagami-mochi. kowa, wasureteta",fr:"Ah, c'est vrai. Kagami-mochi. Ça fait peur, je l'avais oublié."}],
      after:"Elle a envoyé le miroir seul, puis le riz, comme on montre un caractère à un enfant en décomposant le geste. Elle ne savait pas qu'elle faisait un cours."},
     {w:"屈み",r:"kagami",g:"le fait de se pencher",base:1,
      reply:[{f:"keiko",jp:"屈み",ro:"kagami",fr:"Se pencher.",erased:true},{f:"mio",jp:"絶対ちゃう笑",ro:"zettai chau",fr:"Sûrement pas (rire)."},{f:"keiko",jp:"鏡餅",ro:"kagami-mochi",fr:"Kagami-mochi."}],
-     after:"Je lui ai proposé de se pencher. Elle l'a fait, en quelque sorte : elle a corrigé, et sa fille a recopié le bon caractère sur un papier, à Lyon, pour ne plus l'oublier."}
+     after:"Je lui ai proposé de se pencher. Elle l'a fait, en quelque sorte : elle a corrigé elle-même, et le bon caractère est parti en second, comme on recopie un mot pour ne plus l'oublier."}
   ],
-  end:["Mio a ajouté : [[こっちの携帯、もうフランス語の候補しか出てこおへん|kocchi no keitai, mō furansugo no kōho shika dete kōhen|mon téléphone d'ici ne me propose plus que des mots français]]. Je n'ai jamais rencontré ce clavier-là. Je l'imagine plus grand que moi, plus sûr de lui. Il lui propose « Bonne année » avant qu'elle ait pensé à [[あけおめ|akeome|bonne année, en abrégé]]."],
+  end:["Mio a ajouté : [[こっちの携帯、もうフランス語の候補しか出てこおへん|kocchi no keitai, mō furansugo no kōho shika dete kōhen|mon téléphone d'ici ne me propose plus que des mots français]]. Je n'ai jamais rencontré ce clavier-là. Je l'imagine plus grand que moi, plus sûr de lui. Il lui propose « Bonne année » là où elle aurait tapé [[あけおめ|akeome|bonne année, en abrégé]]."],
   learn:false },
 
 { id:"azerty", date:"14 février", clock:"20:15",
   before:["Le 14 février, Keiko est allée dans Réglages, puis Clavier, puis Ajouter. J'ai senti arriver l'autre. Il s'appelle Français (France). Il range les lettres A, Z, E, R, T, Y ; il ne connaît ni [[あかん|akan|ça ne va pas]] ni [[ほんま|honma|vraiment]] ; il met une majuscule à « bonjour » comme un professeur qui reprend une copie.",
-          "Pendant trois semaines, nous avons partagé ses pouces. Elle passait de lui à moi avec la petite touche en forme de globe, au milieu d'une phrase, au milieu d'un mot parfois. Mais le premier soir, celui du 14, elle lui a confié une phrase entière."],
+          "Pendant trois semaines, nous avons partagé son pouce. Elle passait de lui à moi avec la petite touche en forme de globe, au milieu d'une phrase, au milieu d'un mot parfois. Mais le premier soir, celui du 14, elle lui a confié une phrase entière."],
   msgs:[],
   typed:"Mio, je pense ",
   frKeys:true,
@@ -294,7 +295,7 @@ const SCENES = [
      after:"Elle a pris le deuxième mot. Il était sous son pouce depuis toujours, à côté du premier. Il suffisait de le pousser d'un centimètre."},
     {w:"考えとく",r:"kangaetoku",g:"je vais y réfléchir",base:8,
      reply:[{f:"keiko",jp:"考えとく",ro:"kangaetoku",fr:"Je vais y réfléchir."},{f:"keiko",jp:"…ええよ",ro:"… ē yo",fr:"… D'accord."},{f:"mio",jp:"早っ",ro:"haya",fr:"Rapide, la réflexion."}],
-     after:"Elle a réfléchi onze secondes. J'ai l'horodatage. C'est le temps qu'il faut pour taper trois signes, les relire, et comprendre qu'on a déjà répondu."}
+     after:"Elle a réfléchi onze secondes. J'ai l'horodatage. C'est le temps qu'il faut pour taper quatre signes, les relire, et comprendre qu'on a déjà répondu."}
   ],
   end:["Le soir, Keiko a écrit à son mari, qui était dans la pièce d'à côté : [[澪、もう一年やって|Mio, mō ichinen yatte|Mio reste encore un an]]. Puis : [[晩ご飯|bangohan|le dîner]]. C'était le mot suivant. Je l'avais deviné."],
   learn:false },
@@ -329,7 +330,7 @@ function para(text, cls){ const p=document.createElement("p"); if(cls) p.classNa
 function dateLine(t){ const d=document.createElement("div"); d.className="date"; d.textContent=t; voice.appendChild(d); return d; }
 /* sur un écran étroit, le téléphone est sous le récit : on amène le lecteur là où il faut lire ou choisir */
 const narrow = () => matchMedia("(max-width:860px)").matches;
-function bring(el, block){ if(!el || !narrow()) return; const calm = matchMedia("(prefers-reduced-motion: reduce)").matches; el.scrollIntoView({behavior: calm?"auto":"smooth", block: block||"start"}); }
+function bring(el, block){ if(!el) return; const calm = matchMedia("(prefers-reduced-motion: reduce)").matches; el.scrollIntoView({behavior: calm?"auto":"smooth", block: narrow() ? (block||"start") : "nearest"}); }
 const phoneEl = document.querySelector(".phone");
 function toPhone(){ if(narrow()) nextButton("Au téléphone ↓", ()=>bring(phoneEl,"end")); }
 
@@ -392,6 +393,7 @@ function nextButton(label, fn){
   const b=document.createElement("button"); b.className="next"; b.textContent=label;
   b.addEventListener("click",()=>{ b.remove(); fn(); });
   voice.appendChild(b); b.focus({preventScroll:true});
+  setTimeout(()=>bring(b,"nearest"), 250);
 }
 
 async function scene(i){
@@ -414,9 +416,10 @@ async function scene(i){
       typed.textContent="";
       bar.innerHTML="";
       const rep = o.reply.slice();
-      const own = sc.frKeys ? [] : [{f:"keiko",jp:o.w,ro:o.r,fr:o.g}];
+      const own = sc.frKeys ? [] : [{f:"keiko",jp:o.w,ro:o.r,fr:o.g.split(/ — |, en |, tapé| \(/)[0]}];
       const seq = (rep.length && rep[0].f==="keiko") ? rep : own.concat(rep);
       await playMsgs(seq, null);
+      if(narrow()) await wait(1400);
       bring(para(o.after,"after"));
       const date = sc.date.split(" · ")[0];
       if((o.manual && !sc.frKeys) || sc.learn==="choice"){
@@ -457,7 +460,7 @@ async function finale(sc){
       b.addEventListener("click",()=>{ [...bar.children].forEach(c=>c.disabled=true); voice.querySelectorAll(".next").forEach(n=>n.remove()); end(o); });
       bar.appendChild(b);
     });
-    para("Mio a regardé l'écran longtemps. Elle n'a pas cherché le train.");
+    para("L'écran est resté allumé longtemps sans qu'aucune touche bouge. Personne n'a cherché le train.");
     toPhone();
   });
 }
@@ -471,8 +474,8 @@ async function end(o){
   const bye = S.picks.depart ? S.picks.depart.w : "気ぃつけてな";
   const line = [sw.w+"？"].concat(extra).concat([bye]).join("　");
   bring(para(o.w===sw.w
-    ? "Elle a touché le premier mot. Elle l'a envoyé à elle-même, sur son propre téléphone, de l'autre côté de la table. Son téléphone à elle, celui de Lyon, l'a reçu avec une notification en français."
-    : "Elle a touché un autre mot, puis elle est revenue en arrière et a regardé encore le premier. Elle l'a recopié dans son propre téléphone, celui de Lyon, qui ne le connaissait pas et a proposé de le corriger.", "after"));
+    ? "Mio a touché le premier mot. Elle se l'est envoyé, à son propre téléphone posé sur la table, à trente centimètres. Puis elle a rendu le téléphone à sa mère."
+    : "Mio a touché un autre mot, puis elle l'a effacé et elle est revenue au premier. Elle se l'est envoyé, à son propre téléphone posé sur la table, à trente centimètres. Puis elle a rendu le téléphone à sa mère.", "after"));
   await wait(400);
   dateLine("10 septembre · aéroport du Kansai");
   $("clock").textContent="21:55";
@@ -484,9 +487,9 @@ async function end(o){
   await wait(700);
   bubble({f:"mio",jp:sw.w+"。泣いてへんで",ro:sw.r+". naitehen de",fr:"Ça va. Je ne pleure pas, hein."});
   await wait(400);
-  para("Je ne sais pas ce que veut dire « après ». Je n'ai pas de mot pour ce qui vient après le dernier mot. Je sais seulement proposer le suivant, et regarder, dans le petit dictionnaire, la langue qu'elles se sont faite : une langue de deux personnes, que personne ne parle, et que j'ai apprise en devinant mal.");
+  para("Je n'ai pas de mot pour ce qui vient après le dernier mot. Je sais seulement proposer le suivant. Dans le petit dictionnaire, il reste une langue de deux personnes, que personne d'autre ne parle, et que j'ai apprise en devinant mal.");
   const card=document.createElement("section"); card.className="endcard";
-  card.innerHTML=`<h2>Dictionnaire utilisateur — Keiko</h2><div class="hint">État au 10 septembre. Ce sont les mots que vous avez choisis pour elle.</div>`+dictTable();
+  card.innerHTML=`<h2>Dictionnaire utilisateur — Keiko</h2><div class="hint">État au 10 septembre. Les mots qu'elle a appris à taper cette année, avec ceux que vous avez choisis pour elle.</div>`+dictTable();
   voice.appendChild(card); bindJp(card);
   nextButton("Recommencer", ()=>location.reload());
 }
@@ -500,10 +503,11 @@ function dictTable(){
 function bindJp(root){
   root.querySelectorAll(".jp").forEach(el=>{
     const show=()=>{ const r=el.getBoundingClientRect(); tip.innerHTML=`<b>${el.dataset.r}</b> — ${el.dataset.g}`; tip.style.left=Math.min(window.innerWidth-290,Math.max(8,r.left))+"px"; tip.style.top=(r.bottom+8)+"px"; tip.classList.add("on"); };
-    const hide=()=>tip.classList.remove("on");
+    let pin=0;
+    const hide=()=>{ if(Date.now()<pin) return; tip.classList.remove("on"); };
     el.addEventListener("mouseenter",show); el.addEventListener("mouseleave",hide);
     el.addEventListener("focus",show); el.addEventListener("blur",hide);
-    el.addEventListener("click",()=>{ show(); speak(el.textContent,"ja-JP",true); setTimeout(hide,2600); });
+    el.addEventListener("click",()=>{ pin=Date.now()+2500; show(); speak(el.textContent,"ja-JP",true); setTimeout(()=>{ pin=0; hide(); },2600); });
   });
 }
 
@@ -521,6 +525,10 @@ function speak(text, lang, force){
 $("bVoice").addEventListener("click",e=>{
   S.voice=!S.voice; e.currentTarget.setAttribute("aria-pressed",S.voice);
   if(!S.voice && "speechSynthesis" in window) speechSynthesis.cancel();
+});
+$("bTr").addEventListener("click",e=>{
+  const on=document.body.classList.toggle("tr"); e.currentTarget.setAttribute("aria-pressed",on);
+  chat.scrollTop = chat.scrollHeight;
 });
 $("bTheme").addEventListener("click",()=>{
   const r=document.documentElement;
