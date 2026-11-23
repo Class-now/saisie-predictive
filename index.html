@@ -211,10 +211,10 @@ const SCENES = [
   typed:"saba",
   opts:[
     {w:"鯖",r:"saba",g:"le maquereau",base:2,
-     reply:[{f:"keiko",jp:"鯖？",ro:"saba ?",fr:"Maquereau ?"},{f:"mio",jp:"鯖？？？ ça va のこと？笑笑笑",ro:"saba ??? « ça va » no koto ?",fr:"Maquereau ??? Tu veux dire « ça va » ? (rire)"},{f:"keiko",jp:"鯖。",ro:"saba.",fr:"Maquereau."},{f:"mio",jp:"鯖鯖",ro:"saba saba",fr:"Maquereau, maquereau."}],
+     reply:[{f:"keiko",jp:"鯖？",ro:"saba ?",fr:"Maquereau ?"},{f:"mio",jp:"鯖？？？ ça va のこと？笑笑笑",ro:"saba ??? « ça va » no koto ?",fr:"Maquereau ??? Tu veux dire « ça va » ? (rire)"},{f:"keiko",jp:"鯖。",ro:"saba.",fr:"Maquereau."},{f:"mio",jp:"鯖鯖。ça va bien, et toi ?",ro:"saba saba. « ça va bien, et toi ? »",fr:"Maquereau, maquereau. Ça va bien, et toi ?"}],
      after:"Dans mon grand dictionnaire, [[鯖|saba|le maquereau]] est un poisson. Dans le petit, depuis ce soir, c'est une question. Je ne l'ai pas compris tout de suite. Les dictionnaires n'ont pas de sens de l'humour ; ils ont des fréquences, et la fréquence de ce poisson, entre elles deux, n'a cessé de monter."},
     {w:"さば",r:"saba",g:"en hiragana, sans le poisson",base:1,
-     reply:[{f:"keiko",jp:"さば？",ro:"saba ?",fr:"Saba ?"},{f:"mio",jp:"さば…？ あ、ça va か！ça va bien !",ro:"saba… ? a, « ça va » ka !",fr:"Saba… ? Ah, « ça va » ! Ça va bien !"}],
+     reply:[{f:"keiko",jp:"さば？",ro:"saba ?",fr:"Saba ?"},{f:"mio",jp:"さば…？ あ、ça va か！ça va bien, et toi ?",ro:"saba… ? a, « ça va » ka ! « ça va bien, et toi ? »",fr:"Saba… ? Ah, « ça va » ! Ça va bien, et toi ?"}],
      after:"Elle a refusé le poisson et gardé les deux syllabes nues. Mio a mis une seconde à comprendre. Pendant une seconde, sa mère a parlé une langue que personne d'autre au monde ne parlait."},
     {w:"サヴァ",r:"sava",g:"ça va — tapé lettre par lettre",manual:true,base:0,
      reply:[{f:"keiko",jp:"サヴァ？",ro:"sava ?",fr:"Ça va ?"},{f:"mio",jp:"サヴァ！ ça va bien, et toi ?",ro:"sava ! « ça va bien, et toi ? »",fr:"Ça va ! Ça va bien, et toi ?"}],
@@ -228,15 +228,15 @@ const SCENES = [
   msgs:[{f:"mio",jp:"寮、みんな帰省して誰もおらへん",ro:"ryō, minna kisei shite daremo orahen",fr:"À la résidence, tout le monde est rentré chez soi. Il n'y a plus personne."}],
   typed:"jowa",
   opts:[
-    {w:"メリークリスマス",r:"merī kurisumasu",g:"Merry Christmas — dans le grand dictionnaire",base:3,
+    {w:"メリークリスマス",r:"merī kurisumasu",g:"Merry Christmas — proposé le 24 décembre, quoi qu'on tape",base:3,
      reply:[{f:"mio",jp:"メリクリ。こっちは Joyeux Noël やで",ro:"merikuri. kocchi wa « Joyeux Noël » ya de",fr:"Joyeux Noël. Ici, on dit « Joyeux Noël »."}],
      after:"J'ai proposé l'anglais, parce que c'est l'anglais que le Japon a appris pour Noël. Mio l'a corrigé avec douceur, en citant la langue où elle était seule ce soir-là."},
     {w:"除夜",r:"joya",g:"la nuit du 31 décembre",base:1,
      reply:[{f:"keiko",jp:"除夜",ro:"joya",fr:"La nuit du réveillon.",erased:true},{f:"mio",jp:"まだ一週間早いで",ro:"mada isshūkan hayai de",fr:"T'as une semaine d'avance."}],
-     after:"Je l'ai envoyée une semaine trop tôt, dans la nuit des cent huit cloches. Il fallait bien que l'année passe plus vite pour quelqu'un."},
+     after:"J'ai avancé le calendrier d'une semaine, jusqu'à la nuit des cent huit cloches. Il fallait bien que l'année passe plus vite pour quelqu'un."},
     {w:"ジョワイユー・ノエル",r:"jowaiyū noeru",g:"Joyeux Noël — tapé lettre par lettre",manual:true,base:0,
      reply:[{f:"keiko",jp:"ジョワイユー・ノエル",ro:"jowaiyū noeru",fr:"Joyeux Noël."},{f:"mio",jp:"ママ…泣く",ro:"mama… naku",fr:"Maman… je vais pleurer."}],
-     after:"Elle a mis le petit point du milieu entre les deux mots, comme on met une main sur une épaule. Il est 16 h 50 à Lyon. Mio a répondu en moins d'une minute."}
+     after:"Elle a mis le petit point du milieu entre les deux mots, comme on met une main sur une épaule. Il est 15 h 50 à Lyon. Mio a répondu en moins d'une minute."}
   ],
   end:[],
   learn:{w:"ジョワイユー・ノエル",r:"jowaiyū noeru",g:"Joyeux Noël ; la phrase recopiée quatre fois"} },
@@ -262,7 +262,7 @@ const SCENES = [
 
 { id:"azerty", date:"14 février", clock:"20:15",
   before:["Le 14 février, Keiko est allée dans Réglages, puis Clavier, puis Ajouter. J'ai senti arriver l'autre. Il s'appelle Français (France). Il range les lettres A, Z, E, R, T, Y ; il ne connaît ni [[あかん|akan|ça ne va pas]] ni [[ほんま|honma|vraiment]] ; il met une majuscule à « bonjour » comme un professeur qui reprend une copie.",
-          "Pendant trois semaines, nous avons partagé ses pouces. Elle passait de lui à moi avec la petite touche en forme de globe, au milieu d'une phrase, au milieu d'un mot parfois. Ce soir-là, elle lui a confié une phrase entière."],
+          "Pendant trois semaines, nous avons partagé ses pouces. Elle passait de lui à moi avec la petite touche en forme de globe, au milieu d'une phrase, au milieu d'un mot parfois. Mais le premier soir, celui du 14, elle lui a confié une phrase entière."],
   msgs:[],
   typed:"Mio, je pense ",
   frKeys:true,
@@ -326,7 +326,12 @@ function rich(s){
   return s.replace(/\[\[([^|\]]+)\|([^|\]]+)\|([^\]]+)\]\]/g,(m,w,r,g)=>`<span class="jp" tabindex="0" data-r="${r}" data-g="${g}" lang="ja">${w}</span>`);
 }
 function para(text, cls){ const p=document.createElement("p"); if(cls) p.className=cls; p.innerHTML=rich(text); voice.appendChild(p); bindJp(p); speak(p.textContent,"fr-FR"); return p; }
-function dateLine(t){ const d=document.createElement("div"); d.className="date"; d.textContent=t; voice.appendChild(d); }
+function dateLine(t){ const d=document.createElement("div"); d.className="date"; d.textContent=t; voice.appendChild(d); return d; }
+/* sur un écran étroit, le téléphone est sous le récit : on amène le lecteur là où il faut lire ou choisir */
+const narrow = () => matchMedia("(max-width:860px)").matches;
+function bring(el, block){ if(!el || !narrow()) return; const calm = matchMedia("(prefers-reduced-motion: reduce)").matches; el.scrollIntoView({behavior: calm?"auto":"smooth", block: block||"start"}); }
+const phoneEl = document.querySelector(".phone");
+function toPhone(){ if(narrow()) nextButton("Au téléphone ↓", ()=>bring(phoneEl,"end")); }
 
 function bubble(m, stamp){
   if(stamp){ const st=document.createElement("div"); st.className="stamp"; st.textContent=stamp; chat.appendChild(st); }
@@ -372,7 +377,7 @@ function setBar(options, onPick){
     b.className="sug"+(o.manual?" manual":"");
     const n = (o.base||0)+freqOf(o.w);
     b.innerHTML=`<span lang="${/[぀-ヿ一-鿿]/.test(o.w)?"ja":"fr"}">${o.w}</span><small>${o.manual?"⌨ ":""}${o.g}</small>${o.manual?"":`<span class="n">${n}</span>`}`;
-    b.addEventListener("click",()=>{ [...bar.children].forEach(c=>c.disabled=true); onPick(o,idx); });
+    b.addEventListener("click",()=>{ [...bar.children].forEach(c=>c.disabled=true); voice.querySelectorAll(".next").forEach(n=>n.remove()); onPick(o,idx); });
     b.addEventListener("mouseenter",()=>speak(o.w, /[぀-ヿ一-鿿]/.test(o.w)?"ja-JP":"fr-FR", true));
     bar.appendChild(b);
   });
@@ -393,11 +398,12 @@ async function scene(i){
   S.i=i;
   const sc=SCENES[i];
   drawKeys(!!sc.frKeys);
-  dateLine(sc.date); $("clock").textContent=sc.clock;
+  bring(dateLine(sc.date)); $("clock").textContent=sc.clock;
   for(const t of sc.before){ para(t); await wait(250); }
   await playMsgs(sc.msgs, sc.date.split(" · ")[0]);
   if(sc.before2){ para(sc.before2); }
   if(sc.opts==="final"){ return finale(sc); }
+  toPhone();
   let opts = sc.opts;
   if(sc.id==="azerty" && !(S.picks.sava && S.picks.sava.w==="鯖")) opts = opts.map(o=>o.manual ? ALT_AZERTY : o);
   typeOut(sc.typed, ()=>{
@@ -411,7 +417,7 @@ async function scene(i){
       const own = sc.frKeys ? [] : [{f:"keiko",jp:o.w,ro:o.r,fr:o.g}];
       const seq = (rep.length && rep[0].f==="keiko") ? rep : own.concat(rep);
       await playMsgs(seq, null);
-      para(o.after,"after");
+      bring(para(o.after,"after"));
       const date = sc.date.split(" · ")[0];
       if((o.manual && !sc.frKeys) || sc.learn==="choice"){
         learn({w:o.w,r:o.r,g: sc.id==="sava" ? "« ça va » ; la question de Keiko" : o.g}, date);
@@ -448,10 +454,11 @@ async function finale(sc){
     opts.forEach(o=>{
       const b=document.createElement("button"); b.className="sug";
       b.innerHTML=`<span lang="ja">${o.w}</span><small>${o.g}</small><span class="n">${fake[o.w]}</span>`;
-      b.addEventListener("click",()=>{ [...bar.children].forEach(c=>c.disabled=true); end(o); });
+      b.addEventListener("click",()=>{ [...bar.children].forEach(c=>c.disabled=true); voice.querySelectorAll(".next").forEach(n=>n.remove()); end(o); });
       bar.appendChild(b);
     });
     para("Mio a regardé l'écran longtemps. Elle n'a pas cherché le train.");
+    toPhone();
   });
 }
 
@@ -463,9 +470,9 @@ async function end(o){
   const extra = learned.filter(w=>w!==sw.w).slice(0,2);
   const bye = S.picks.depart ? S.picks.depart.w : "気ぃつけてな";
   const line = [sw.w+"？"].concat(extra).concat([bye]).join("　");
-  para(o.w===sw.w
+  bring(para(o.w===sw.w
     ? "Elle a touché le premier mot. Elle l'a envoyé à elle-même, sur son propre téléphone, de l'autre côté de la table. Son téléphone à elle, celui de Lyon, l'a reçu avec une notification en français."
-    : "Elle a touché un autre mot, puis elle est revenue en arrière et a regardé encore le premier. Elle l'a recopié dans son propre téléphone, celui de Lyon, qui ne le connaissait pas et a proposé de le corriger.", "after");
+    : "Elle a touché un autre mot, puis elle est revenue en arrière et a regardé encore le premier. Elle l'a recopié dans son propre téléphone, celui de Lyon, qui ne le connaissait pas et a proposé de le corriger.", "after"));
   await wait(400);
   dateLine("10 septembre · aéroport du Kansai");
   $("clock").textContent="21:55";
