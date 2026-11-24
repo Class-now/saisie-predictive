@@ -81,6 +81,18 @@ table.dict th{text-align:left;font-weight:500;color:var(--mute);border-bottom:1p
 table.dict td{border-bottom:1px solid var(--line);padding:7px 4px;vertical-align:top}
 table.dict td.w{font-family:"Hiragino Sans","Noto Sans JP",sans-serif;font-size:16px}
 .endcard{margin-top:28px;padding:20px;border:1px solid var(--line);border-radius:14px}
+.toast{position:absolute;left:12px;right:12px;top:34px;z-index:5;background:var(--ink);color:var(--bg);font:13px/1.35 system-ui,sans-serif;padding:7px 10px;border-radius:10px;opacity:0;transform:translateY(-6px);transition:opacity .25s,transform .25s;pointer-events:none}
+.toast.on{opacity:1;transform:none}
+.toast b{font-family:"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;font-weight:600}
+.sug .n.up{color:var(--new);font-weight:600}
+/* écran étroit : pendant le choix, la barre de suggestions reste au bas de l'écran */
+@media (max-width:860px){
+  body.choosing{padding-bottom:110px}
+  body.choosing .phone{scroll-margin-bottom:118px}
+  body.choosing .bar{position:fixed;left:8px;right:8px;bottom:max(8px,env(safe-area-inset-bottom));z-index:15;flex-wrap:wrap;box-shadow:0 6px 30px rgba(0,0,0,.25);border:1px solid var(--line)}
+  body.choosing .bar::before{content:attr(data-typed);flex:0 0 100%;font:12px/1.2 system-ui,sans-serif;color:var(--mute);padding:0 2px 2px}
+}
+@media (prefers-reduced-motion: reduce){.toast{transition:none}}
 .endcard h2{font-weight:400;margin:0 0 6px}
 </style>
 </head>
@@ -100,6 +112,7 @@ table.dict td.w{font-family:"Hiragino Sans","Noto Sans JP",sans-serif;font-size:
 
   <aside class="phone" aria-label="Téléphone de Keiko">
     <div class="status"><span id="clock">21:40</span><span>Mio 🇫🇷</span><span>▮▮▮ 82%</span></div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <div class="chat" id="chat"></div>
     <div class="typing" id="typing"><span id="typed"></span><span class="caret"></span></div>
     <div class="bar" id="bar" role="group" aria-label="Suggestions"></div>
@@ -349,9 +362,20 @@ function bubble(m, stamp){
 }
 
 function freqOf(w){ const e=S.dict.find(d=>d.w===w); return e?e.n:0; }
+function rankOf(w){ return S.dict.slice().sort((a,b)=>b.n-a.n).findIndex(d=>d.w===w)+1; }
 function learn(entry, date){
   const e=S.dict.find(d=>d.w===entry.w);
+  const before = e ? rankOf(entry.w) : 0;
   if(e){ e.n++; } else { S.dict.push({w:entry.w,r:entry.r,g:entry.g,date,n:1}); }
+  const after = rankOf(entry.w);
+  toast(e
+    ? `↑ <b lang="ja">${entry.w}</b> — fréquence ${e.n}${after<before?`, monte au rang ${after}`:""}`
+    : `+ <b lang="ja">${entry.w}</b> — nouveau dans le dictionnaire utilisateur (rang ${after} sur ${S.dict.length})`);
+}
+let toastQ = Promise.resolve();
+function toast(html){
+  const el=$("toast");
+  toastQ = toastQ.then(async ()=>{ el.innerHTML=html; el.classList.add("on"); await wait(2600); el.classList.remove("on"); await wait(300); });
 }
 
 function typeOut(str, cb){
@@ -373,12 +397,14 @@ async function playMsgs(list, stamp){
 
 function setBar(options, onPick){
   bar.innerHTML="";
+  bar.dataset.typed = "Keiko tape : « "+typed.textContent+" » — choisissez le mot";
+  document.body.classList.add("choosing");
   options.forEach((o,idx)=>{
     const b=document.createElement("button");
     b.className="sug"+(o.manual?" manual":"");
     const n = (o.base||0)+freqOf(o.w);
-    b.innerHTML=`<span lang="${/[぀-ヿ一-鿿]/.test(o.w)?"ja":"fr"}">${o.w}</span><small>${o.manual?"⌨ ":""}${o.g}</small>${o.manual?"":`<span class="n">${n}</span>`}`;
-    b.addEventListener("click",()=>{ [...bar.children].forEach(c=>c.disabled=true); voice.querySelectorAll(".next").forEach(n=>n.remove()); onPick(o,idx); });
+    b.innerHTML=`<span lang="${/[぀-ヿ一-鿿]/.test(o.w)?"ja":"fr"}">${o.w}</span><small>${o.manual?"⌨ ":""}${o.g}</small>${o.manual?"":`<span class="n${freqOf(o.w)?" up":""}">${n}${freqOf(o.w)?" ↑":""}</span>`}`;
+    b.addEventListener("click",()=>{ [...bar.children].forEach(c=>c.disabled=true); document.body.classList.remove("choosing"); voice.querySelectorAll(".next").forEach(n=>n.remove()); onPick(o,idx); });
     b.addEventListener("mouseenter",()=>speak(o.w, /[぀-ヿ一-鿿]/.test(o.w)?"ja-JP":"fr-FR", true));
     bar.appendChild(b);
   });
@@ -454,10 +480,13 @@ async function finale(sc){
   const fake = {}; fake[sw.w]=freqOf(sw.w)+S.bonus; fake["堺東"]=11; fake["再来週"]=6;
   typeOut(sc.typed, ()=>{
     bar.innerHTML="";
+    bar.dataset.typed = "Mio tape : « "+sc.typed+" » sur le téléphone de sa mère";
+    document.body.classList.add("choosing");
     opts.forEach(o=>{
       const b=document.createElement("button"); b.className="sug";
-      b.innerHTML=`<span lang="ja">${o.w}</span><small>${o.g}</small><span class="n">${fake[o.w]}</span>`;
-      b.addEventListener("click",()=>{ [...bar.children].forEach(c=>c.disabled=true); voice.querySelectorAll(".next").forEach(n=>n.remove()); end(o); });
+      const up = o.w===sw.w;
+      b.innerHTML=`<span lang="ja">${o.w}</span><small>${o.g}</small><span class="n${up?" up":""}">${fake[o.w]}${up?" ↑":""}</span>`;
+      b.addEventListener("click",()=>{ [...bar.children].forEach(c=>c.disabled=true); document.body.classList.remove("choosing"); voice.querySelectorAll(".next").forEach(n=>n.remove()); end(o); });
       bar.appendChild(b);
     });
     para("L'écran est resté allumé longtemps sans qu'aucune touche bouge. Personne n'a cherché le train.");
@@ -547,7 +576,7 @@ $("bDict").addEventListener("click",()=>{
   for(const t of PROLOGUE){ para(t); await wait(200); }
   const h=document.createElement("p"); h.className="hint"; h.textContent=HINT; voice.appendChild(h);
   let started=false;
-  const start=()=>{ if(started) return; started=true; bar.innerHTML=""; const nb=voice.querySelector(".next"); if(nb) nb.remove(); scene(0); };
+  const start=()=>{ if(started) return; started=true; bar.innerHTML=""; document.body.classList.remove("choosing"); const nb=voice.querySelector(".next"); if(nb) nb.remove(); scene(0); };
   bar.innerHTML='<button class="sug" id="go"><span lang="ja">はじめる</span><small>commencer</small></button>';
   $("go").addEventListener("click",start);
   nextButton("Commencer →", start);
